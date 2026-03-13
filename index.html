@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>Adam-Node: AI Bus Monitor (WASM Edition)</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.39.0/build/stlite.css"
+    />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.39.0/build/stlite.js"></script>
+    <script>
+      stlite.mount({
+        requirements: ["pandas"],
+        entrypoint: "adam_app.py",
+        files: {
+          "adam_app.py": `
+import streamlit as st
+import time
+import pandas as pd
+from datetime import datetime
+
+st.set_page_config(page_title="Adam-Node: AI Bus Monitor", layout="wide")
+
+if 'logs' not in st.session_state:
+    st.session_state.logs = ["[20:49:00] PROTOCOL_SYNC_COMPLETED (Static WASM)"]
+if 'protocol' not in st.session_state:
+    st.session_state.protocol = {
+        "0x01": "Grill_Steak_Medium",
+        "0x02": "Brew_Triple_Espresso",
+        "0x03": "Late_Night_Burger"
+    }
+
+st.title("🛡️ Adam-Node: AI Node 逻辑总线实验 (WASM)")
+st.caption("该实验直接在浏览器中通过 WebAssembly 运行，模拟高效的二进制指令流同步。")
+
+with st.sidebar:
+    st.header("🤝 语义握手层")
+    proto_df = pd.DataFrame(list(st.session_state.protocol.items()), columns=['OpCode', 'LogicFunction'])
+    st.table(proto_df)
+
+col1, col2 = st.columns([1, 2])
+with col1:
+    st.header("🎮 控制平面")
+    if st.button("发送 0x01 (牛排)"):
+        st.session_state.logs.append(f"[{datetime.now().strftime('%H:%M:%S.%f')[:-3]}] OUT: [0x01] -> Node_Chef")
+        st.session_state.logs.append(f"[{datetime.now().strftime('%H:%M:%S.%f')[:-3]}] IN: [0x00 Success] -> Executed: Grill_Steak")
+    if st.button("发送 0x02 (咖啡)"):
+        st.session_state.logs.append(f"[{datetime.now().strftime('%H:%M:%S.%f')[:-3]}] OUT: [0x02] -> Node_Chef")
+        st.session_state.logs.append(f"[{datetime.now().strftime('%H:%M:%S.%f')[:-3]}] IN: [0x00 Success] -> Executed: Brew_Espresso")
+
+with col2:
+    st.header("📡 总线监控 (Bus Traffic)")
+    st.code("\\n".join(st.session_state.logs[-15:]), language="text")
+
+st.divider()
+st.subheader("⚙️ 节点运行报告")
+c1, c2, c3 = st.columns(3)
+c1.metric("LLM 占用", "0%", "Static Path")
+c2.metric("指令延迟", "0.01ms", "Local WASM")
+c3.metric("传输损耗", "4 Bytes", "Binary Optim")
+          `
+        }
+      }, document.getElementById("root"));
+    </script>
+  </body>
+</html>

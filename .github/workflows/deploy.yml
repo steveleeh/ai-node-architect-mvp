@@ -1,22 +1,21 @@
 
-name: Sync to Hugging Face space
+name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
-  # 允许手动触发
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          lfs: true
+      - uses: actions/checkout@v3
 
-      - name: Push to hub
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: git push https://stvelee:$HF_TOKEN@huggingface.co/spaces/stvelee/ai-node-mvp main
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: .
+          branch: gh-pages
