@@ -1,0 +1,26 @@
+
+name: Sync to Hugging Face
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Push to hub
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          # 仅同步 ai-node-mvp 文件夹下的内容到 HF 根目录
+          cd ai-node-mvp/
+          git init
+          git config user.name "Adam"
+          git config user.email "adam@openclaw.ai"
+          git add .
+          git commit -m "Internal Sync: Deploying from ai-node-mvp directory"
+          git push https://steveleeh:$HF_TOKEN@huggingface.co/spaces/steveleeh/ai-node-mvp main --force
